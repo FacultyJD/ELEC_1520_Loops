@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>C For Loop - Interactive Learning Lab</title>
+<style>
+  :root {
+    --bg: #f4f7fb;
+    --panel: #ffffff;
+    --text: #1f2937;
+    --muted: #64748b;
+    --primary: #2563eb;
+    --primary-soft: #dbeafe;
+    --accent: #0f766e;
+    --border: #dbe3ef;
+    --code: #0f172a;
+    --code-text: #e2e8f0;
+    --success: #15803d;
+    --warning: #b45309;
+    --shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+  }
+  header {
+    background: linear-gradient(135deg, #1d4ed8, #0f766e);
+    color: white;
+    padding: 32px 20px 26px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  header h1 { margin: 0 0 8px; font-size: clamp(28px, 4vw, 44px); }
+  header p { margin: 0; max-width: 850px; opacity: .95; }
+  .pillbar { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    background: rgba(255,255,255,.14);
+    border: 1px solid rgba(255,255,255,.22);
+    padding: 6px 10px; border-radius: 999px; font-size: 13px;
+  }
+  main { padding: 24px 20px 48px; }
+  .intro-grid, .example-grid, .pattern-grid {
+    display: grid; gap: 18px;
+  }
+  .intro-grid { grid-template-columns: 1.2fr .8fr; }
+  .example-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pattern-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .card {
+    background: var(--panel); border: 1px solid var(--border); border-radius: 16px;
+    padding: 18px; box-shadow: var(--shadow);
+  }
+  .card h2, .card h3 { margin-top: 0; }
+  .formula {
+    font-size: 18px; text-align: center; padding: 14px; border-radius: 12px;
+    background: #eff6ff; border: 1px solid #bfdbfe; margin: 12px 0;
+  }
+  .legend { display: grid; gap: 9px; margin-top: 14px; }
+  .legend div { padding: 9px 11px; border-radius: 9px; }
+  .init { background: #ecfdf5; border-left: 4px solid #16a34a; }
+  .cond { background: #fff7ed; border-left: 4px solid #ea580c; }
+  .update { background: #eff6ff; border-left: 4px solid #2563eb; }
+  .tabs {
+    display: flex; flex-wrap: wrap; gap: 8px; margin: 22px 0 14px;
+    position: sticky; top: 0; z-index: 5; padding: 8px 0; background: rgba(244,247,251,.92);
+    backdrop-filter: blur(8px);
+  }
+  .tab-btn {
+    border: 1px solid var(--border); background: #fff; color: #334155;
+    padding: 9px 13px; border-radius: 10px; cursor: pointer; font-weight: 600;
+  }
+  .tab-btn:hover { border-color: #93c5fd; }
+  .tab-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .subtabs { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 14px; }
+  .subtab-btn {
+    border: 1px solid var(--border); background: #fff; padding: 8px 11px; border-radius: 8px;
+    cursor: pointer; color: #334155;
+  }
+  .subtab-btn.active { background: #e0e7ff; border-color: #a5b4fc; color: #3730a3; font-weight: 700; }
+  .subpanel { display: none; }
+  .subpanel.active { display: block; }
+  .split { display:grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 10px 0 14px; }
+  label { font-weight: 600; }
+  input, select, textarea {
+    border: 1px solid #cbd5e1; border-radius: 8px; padding: 9px 10px; font: inherit; background: white;
+  }
+  input[type=number] { width: 100px; }
+  textarea {
+    width: 100%; min-height: 200px; resize: vertical; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    background: var(--code); color: var(--code-text); border-color: #1e293b;
+  }
+  .code {
+    margin: 0; padding: 16px; border-radius: 12px; background: var(--code); color: var(--code-text);
+    overflow: auto; font-size: 14px; line-height: 1.55;
+  }
+  button.run, button.secondary, button.primary {
+    border: 0; border-radius: 9px; padding: 9px 13px; cursor:pointer; font-weight: 700;
+  }
+  button.run, button.primary { background: var(--primary); color: white; }
+  button.secondary { background: #e2e8f0; color: #1e293b; }
+  button.run:hover, button.primary:hover { filter: brightness(.95); }
+  .output {
+    background: #07101f; color: #cbd5e1; padding: 14px; border-radius: 12px;
+    min-height: 100px; white-space: pre-wrap; font-family: ui-monospace, monospace;
+    border: 1px solid #1e293b;
+  }
+  .visual {
+    min-height: 170px; padding: 15px; border-radius: 12px; background: #f8fafc; border: 1px dashed #cbd5e1;
+  }
+  .steps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .step {
+    min-width: 72px; text-align:center; padding: 9px 8px; border-radius: 9px; background: white;
+    border: 1px solid #cbd5e1; transition: .2s;
+  }
+  .step.active { background: #dbeafe; border-color: #2563eb; transform: translateY(-3px); }
+  .array { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .cell {
+    width: 58px; height: 58px; display:grid; place-items:center; border:1px solid #94a3b8;
+    background:white; border-radius:9px; font-weight:700; transition:.2s;
+  }
+  .cell.active { background:#dbeafe; border:2px solid #2563eb; transform:scale(1.05); }
+  .matrix { display:grid; gap:7px; width:max-content; }
+  .matrix-cell { width:52px; height:42px; display:grid; place-items:center; border:1px solid #cbd5e1; border-radius:7px; background:#fff; font-weight:700; }
+  .matrix-cell.active { background:#ccfbf1; border-color:#0f766e; }
+  .pattern {
+    display:inline-block; background:#0b1220; color:#f8fafc; padding:16px; border-radius:11px;
+    font-family: ui-monospace, monospace; white-space: pre; min-width: 220px;
+  }
+  .timeline { display:grid; gap:9px; margin-top:12px; }
+  .timeline-row { display:grid; grid-template-columns: 90px 1fr; gap:10px; align-items:center; }
+  .badge { padding: 6px 8px; border-radius:7px; font-size:12px; font-weight:700; background:#e2e8f0; }
+  .callout { padding: 12px 14px; border-radius: 10px; background: #f0fdf4; border: 1px solid #bbf7d0; }
+  .warning { background:#fffbeb; border-color:#fde68a; }
+  .tiny { color: var(--muted); font-size: 13px; }
+  .challenge { background: linear-gradient(135deg, #f8fafc, #eef2ff); }
+  .footer { margin-top: 28px; color: var(--muted); font-size: 13px; text-align:center; }
+  @media (max-width: 850px) {
+    .intro-grid, .example-grid, .pattern-grid, .split { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Learning the <code>for</code> Loop in C</h1>
+    <p>An interactive student lab for understanding repetition, arrays, nested loops, real-world simulations, and pattern generation.</p>
+    <div class="pillbar">
+      <span class="pill">Beginner friendly</span>
+      <span class="pill">C language examples</span>
+      <span class="pill">Interactive visualizations</span>
+      <span class="pill">Experiment-ready</span>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="intro-grid">
+    <div class="card">
+      <h2>What does a <code>for</code> loop do?</h2>
+      <p>A <code>for</code> loop repeats a block of code while a condition remains true. It is especially useful when you know (or can calculate) how many times a task should repeat.</p>
+      <div class="formula"><strong>for (initialization; condition; update)</strong></div>
+      <div class="legend">
+        <div class="init"><strong>1. Initialization:</strong> start the loop variable, e.g. <code>int i = 1</code>.</div>
+        <div class="cond"><strong>2. Condition:</strong> continue while it is true, e.g. <code>i &lt;= 5</code>.</div>
+        <div class="update"><strong>3. Update:</strong> change the variable, e.g. <code>i++</code>.</div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Loop flow</h2>
+      <div class="timeline">
+        <div class="timeline-row"><span class="badge">START</span><span>Run initialization once.</span></div>
+        <div class="timeline-row"><span class="badge">CHECK</span><span>Test the condition.</span></div>
+        <div class="timeline-row"><span class="badge">BODY</span><span>Execute the statements.</span></div>
+        <div class="timeline-row"><span class="badge">UPDATE</span><span>Change the counter.</span></div>
+        <div class="timeline-row"><span class="badge">REPEAT</span><span>Go back to the condition.</span></div>
+      </div>
+      <div class="callout" style="margin-top:14px;"><strong>Memory trick:</strong> Start → Check → Work → Change → Repeat.</div>
+    </div>
+  </section>
+
+  <nav class="tabs" aria-label="Lesson sections">
+    <button class="tab-btn active" data-tab="basics">1. Single Dimension</button>
+    <button class="tab-btn" data-tab="multi">2. Multidimensional</button>
+    <button class="tab-btn" data-tab="patterns">3. Pattern Generation</button>
+    <button class="tab-btn" data-tab="visuals">4. Visual Lab</button>
+    <button class="tab-btn" data-tab="challenges">5. Student Experiments</button>
+  </nav>
+
+  <section id="basics" class="tab-panel active">
+    <div class="card">
+      <div class="subtabs">
+        <button class="subtab-btn active" data-sub="basic1">Example 1: Count</button>
+        <button class="subtab-btn" data-sub="basic2">Example 2: Array</button>
+        <button class="subtab-btn" data-sub="basic3">Example 3: Table</button>
+        <button class="subtab-btn" data-sub="basic4">Example 4: Real-world Counter</button>
+      </div>
+
+      <div id="basic1" class="subpanel active">
+        <div class="example-grid">
+          <div>
+            <h3>Counting 1 to N</h3>
+            <p>The simplest use: repeat once for each number.</p>
+            <pre class="code">#include &lt;stdio.h&gt;
+
+int main() {
+    for (int i = 1; i &lt;= 5; i++) {
+        printf("%d ", i);
+    }
+    return 0;
+}</pre>
+          </div>
+          <div>
+            <h3>Try it</h3>
+            <div class="controls">
+              <label for="countN">N:</label>
+              <input id="countN" type="number" value="5" min="1" max="30" />
+              <button class="run" onclick="runCount()">Run Loop</button>
+            </div>
+            <div id="countVisual" class="visual"></div>
+            <h4>Console-style output</h4>
+            <div id="countOutput" class="output"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="basic2" class="subpanel">
+        <div class="split">
+          <div>
+            <h3>Single-dimension array</h3>
+            <p>A loop can visit each element using its index.</p>
+            <pre class="code">int marks[] = {72, 81, 66, 90, 78};
+int size = 5;
+
+for (int i = 0; i &lt; size; i++) {
+    printf("%d ", marks[i]);
+}</pre>
+            <div class="callout"><strong>Important:</strong> array indexing in C starts at <code>0</code>.</div>
+          </div>
+          <div>
+            <h3>Interactive array traversal</h3>
+            <div class="controls">
+              <button class="run" onclick="runArray()">Animate Traversal</button>
+              <button class="secondary" onclick="resetArray()">Reset</button>
+            </div>
+            <div id="arrayVisual" class="visual"></div>
+            <div id="arrayOutput" class="output" style="margin-top:10px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="basic3" class="subpanel">
+        <div class="example-grid">
+          <div>
+            <h3>Multiplication table</h3>
+            <pre class="code">int n = 7;
+
+for (int i = 1; i &lt;= 10; i++) {
+    printf("%d x %d = %d\n", n, i, n * i);
+}</pre>
+            <p class="tiny">This is a useful real-time example because the same loop structure can produce any table.</p>
+          </div>
+          <div>
+            <h3>Choose a table</h3>
+            <div class="controls">
+              <label for="tableN">Number:</label>
+              <input id="tableN" type="number" value="7" min="1" max="20" />
+              <button class="run" onclick="runTable()">Generate</button>
+            </div>
+            <div id="tableOutput" class="output"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="basic4" class="subpanel">
+        <div class="split">
+          <div>
+            <h3>Real-world: attendance counter</h3>
+            <p>Imagine a class has a fixed number of students. A <code>for</code> loop can move through the student list one-by-one.</p>
+            <pre class="code">for (int student = 1; student &lt;= 8; student++) {
+    printf("Checking student %d\n", student);
+}</pre>
+            <div class="callout warning"><strong>Experiment:</strong> Change the class size and observe how the number of loop iterations changes.</div>
+          </div>
+          <div>
+            <h3>Live attendance simulation</h3>
+            <div class="controls">
+              <label for="students">Students:</label>
+              <input id="students" type="number" value="8" min="1" max="25" />
+              <button class="run" onclick="runAttendance()">Start Check</button>
+            </div>
+            <div id="attendanceVisual" class="visual"></div>
+            <div id="attendanceOutput" class="output" style="margin-top:10px;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="multi" class="tab-panel">
+    <div class="card">
+      <div class="subtabs">
+        <button class="subtab-btn active" data-sub="multi1">Example 1: Matrix</button>
+        <button class="subtab-btn" data-sub="multi2">Example 2: Seating Grid</button>
+        <button class="subtab-btn" data-sub="multi3">Example 3: Pixel Grid</button>
+      </div>
+
+      <div id="multi1" class="subpanel active">
+        <div class="split">
+          <div>
+            <h3>Nested loops = loop inside a loop</h3>
+            <pre class="code">int a[3][4] = {
+    {1, 2, 3, 4},
+    {5, 6, 7, 8},
+    {9, 10, 11, 12}
+};
+
+for (int row = 0; row &lt; 3; row++) {
+    for (int col = 0; col &lt; 4; col++) {
+        printf("%d ", a[row][col]);
+    }
+    printf("\n");
+}</pre>
+            <div class="callout"><strong>Think of it as:</strong> outer loop chooses the row; inner loop walks across the columns.</div>
+          </div>
+          <div>
+            <h3>Matrix animation</h3>
+            <div class="controls">
+              <button class="run" onclick="animateMatrix()">Run Nested Loops</button>
+              <button class="secondary" onclick="resetMatrix()">Reset</button>
+            </div>
+            <div id="matrixVisual" class="visual"></div>
+            <div id="matrixOutput" class="output" style="margin-top:10px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="multi2" class="subpanel">
+        <div class="example-grid">
+          <div>
+            <h3>Real-world: classroom seating</h3>
+            <pre class="code">for (int row = 1; row &lt;= 4; row++) {
+    for (int seat = 1; seat &lt;= 5; seat++) {
+        printf("R%d-S%d ", row, seat);
+    }
+    printf("\n");
+}</pre>
+          </div>
+          <div>
+            <h3>Experiment with rows and seats</h3>
+            <div class="controls">
+              <label>Rows:</label><input id="seatRows" type="number" value="4" min="1" max="8" />
+              <label>Seats:</label><input id="seatCols" type="number" value="5" min="1" max="10" />
+              <button class="run" onclick="drawSeats()">Build Grid</button>
+            </div>
+            <div id="seatVisual" class="visual"></div>
+            <p class="tiny">One outer-loop iteration completes one row; the inner loop completes all seats in that row.</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="multi3" class="subpanel">
+        <div class="split">
+          <div>
+            <h3>Real-world: screen pixels</h3>
+            <p>Many grids can be described with row/column coordinates. The same nested-loop idea appears in image and game-grid algorithms.</p>
+            <pre class="code">for (int y = 0; y &lt; height; y++) {
+    for (int x = 0; x &lt; width; x++) {
+        // process pixel (x, y)
+    }
+}</pre>
+          </div>
+          <div>
+            <h3>Coordinate explorer</h3>
+            <div class="controls">
+              <label>Width:</label><input id="gridW" type="number" value="6" min="1" max="10" />
+              <label>Height:</label><input id="gridH" type="number" value="4" min="1" max="8" />
+              <button class="run" onclick="runPixelGrid()">Visualize</button>
+            </div>
+            <div id="pixelVisual" class="visual"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="patterns" class="tab-panel">
+    <div class="card">
+      <div class="subtabs">
+        <button class="subtab-btn active" data-sub="pat1">Pattern 1: Square</button>
+        <button class="subtab-btn" data-sub="pat2">Pattern 2: Triangle</button>
+        <button class="subtab-btn" data-sub="pat3">Pattern 3: Number Triangle</button>
+        <button class="subtab-btn" data-sub="pat4">Pattern 4: Pyramid</button>
+      </div>
+
+      <div id="pat1" class="subpanel active">
+        <div class="split">
+          <div>
+            <h3>Star square</h3>
+            <pre class="code">for (int row = 1; row &lt;= 5; row++) {
+    for (int col = 1; col &lt;= 5; col++) {
+        printf("* ");
+    }
+    printf("\n");
+}</pre>
+          </div>
+          <div>
+            <h3>Generate it</h3>
+            <div class="controls"><label>Size:</label><input id="squareSize" type="number" value="5" min="1" max="12" /><button class="run" onclick="patternSquare()">Generate</button></div>
+            <div id="squareOut" class="pattern"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="pat2" class="subpanel">
+        <div class="split">
+          <div>
+            <h3>Right triangle</h3>
+            <pre class="code">for (int row = 1; row &lt;= 5; row++) {
+    for (int col = 1; col &lt;= row; col++) {
+        printf("* ");
+    }
+    printf("\n");
+}</pre>
+            <p class="tiny">Notice the inner loop condition changes with <code>row</code>.</p>
+          </div>
+          <div>
+            <h3>Generate it</h3>
+            <div class="controls"><label>Rows:</label><input id="triRows" type="number" value="5" min="1" max="15" /><button class="run" onclick="patternTriangle()">Generate</button></div>
+            <div id="triOut" class="pattern"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="pat3" class="subpanel">
+        <div class="split">
+          <div>
+            <h3>Number triangle</h3>
+            <pre class="code">for (int row = 1; row &lt;= 5; row++) {
+    for (int col = 1; col &lt;= row; col++) {
+        printf("%d ", col);
+    }
+    printf("\n");
+}</pre>
+          </div>
+          <div>
+            <h3>Generate it</h3>
+            <div class="controls"><label>Rows:</label><input id="numRows" type="number" value="5" min="1" max="15" /><button class="run" onclick="patternNumbers()">Generate</button></div>
+            <div id="numOut" class="pattern"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="pat4" class="subpanel">
+        <div class="split">
+          <div>
+            <h3>Centered pyramid</h3>
+            <pre class="code">for (int row = 1; row &lt;= 5; row++) {
+    for (int space = 1; space &lt;= 5 - row; space++) {
+        printf("  ");
+    }
+    for (int star = 1; star &lt;= 2 * row - 1; star++) {
+        printf("* ");
+    }
+    printf("\n");
+}</pre>
+          </div>
+          <div>
+            <h3>Generate it</h3>
+            <div class="controls"><label>Rows:</label><input id="pyrRows" type="number" value="5" min="1" max="12" /><button class="run" onclick="patternPyramid()">Generate</button></div>
+            <div id="pyrOut" class="pattern"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="visuals" class="tab-panel">
+    <div class="card">
+      <h2>Visual: watch the loop variable change</h2>
+      <p>This section focuses on the mental model. Each box represents one iteration of the loop.</p>
+      <div class="controls">
+        <label for="visualStart">Start:</label><input id="visualStart" type="number" value="1" />
+        <label for="visualEnd">End:</label><input id="visualEnd" type="number" value="8" />
+        <label for="visualStep">Step:</label><input id="visualStep" type="number" value="1" min="1" />
+        <button class="run" onclick="animateSteps()">Play</button>
+        <button class="secondary" onclick="showAllSteps()">Show All</button>
+      </div>
+      <div id="stepVisual" class="visual"></div>
+      <div class="callout" style="margin-top:14px;"><strong>Ask yourself:</strong> How many times does the body execute? What is the value of the loop variable on the last iteration?</div>
+    </div>
+
+    <div class="card" style="margin-top:18px;">
+      <h2>Common loop mistakes</h2>
+      <div class="example-grid">
+        <div class="card warning">
+          <h3>Off-by-one</h3>
+          <code>for (int i = 0; i &lt;= 5; i++)</code> runs 6 times (0 through 5), not 5 times.
+        </div>
+        <div class="card warning">
+          <h3>Wrong update</h3>
+          If the condition needs the variable to increase but you never update it, the loop may never end.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="challenges" class="tab-panel">
+    <div class="card challenge">
+      <h2>Student Experiment Lab</h2>
+      <p>Use these starter programs as mini practicals. Change one value at a time and predict the output before clicking Run.</p>
+      <div class="example-grid">
+        <div class="card">
+          <h3>Experiment A: Even numbers</h3>
+          <pre class="code">for (int i = 2; i &lt;= 20; i += 2) {
+    printf("%d ", i);
+}</pre>
+          <p><strong>Question:</strong> How would you print only odd numbers?</p>
+          <div class="controls">
+            <input id="evenLimit" type="number" value="20" min="2" max="100" />
+            <button class="run" onclick="runEven()">Run</button>
+          </div>
+          <div id="evenOut" class="output"></div>
+        </div>
+        <div class="card">
+          <h3>Experiment B: Sum of numbers</h3>
+          <pre class="code">int sum = 0;
+for (int i = 1; i &lt;= n; i++) {
+    sum = sum + i;
+}</pre>
+          <p><strong>Question:</strong> What is the sum from 1 to N?</p>
+          <div class="controls">
+            <input id="sumN" type="number" value="10" min="1" max="1000" />
+            <button class="run" onclick="runSum()">Calculate</button>
+          </div>
+          <div id="sumOut" class="output"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px;">
+        <h3>Editable C scratchpad</h3>
+        <p class="tiny">This editor lets students write C code for practice. Browsers do not compile C by themselves, so this page keeps the scratchpad separate from the visual simulations.</p>
+        <textarea id="scratch">#include &lt;stdio.h&gt;
+
+int main() {
+    for (int i = 1; i &lt;= 5; i++) {
+        printf("%d ", i);
+    }
+    return 0;
+}</textarea>
+        <div class="controls">
+          <button class="secondary" onclick="resetScratch()">Reset starter code</button>
+          <button class="primary" onclick="copyScratch()">Copy C Code</button>
+          <span id="copyMsg" class="tiny"></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="footer">Designed as a standalone teaching page. Save this file as <code>for_loop_c_interactive.html</code> and open it in a browser.</div>
+</main>
+
+<script>
+// ---------- Tabs ----------
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ---------- Subtabs ----------
+// Each group of subtab buttons controls the panel IDs in its section.
+document.querySelectorAll('.card').forEach(card => {
+  const buttons = card.querySelectorAll('.subtab-btn');
+  if (!buttons.length) return;
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      buttons.forEach(b => b.classList.remove('active'));
+      card.querySelectorAll('.subpanel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      const panel = document.getElementById(btn.dataset.sub);
+      if (panel) panel.classList.add('active');
+    });
+  });
+});
+
+function safeInt(id, fallback, min=1, max=100) {
+  const el = document.getElementById(id);
+  let n = parseInt(el.value, 10);
+  if (!Number.isFinite(n)) n = fallback;
+  return Math.min(max, Math.max(min, n));
+}
+
+function runCount() {
+  const n = safeInt('countN', 5, 1, 30);
+  const visual = document.getElementById('countVisual');
+  const out = document.getElementById('countOutput');
+  visual.innerHTML = '<strong>Iterations:</strong><div class="steps" id="countSteps"></div>';
+  const steps = document.getElementById('countSteps');
+  for (let i = 1; i <= n; i++) {
+    const box = document.createElement('div');
+    box.className = 'step'; box.textContent = `i = ${i}`; steps.appendChild(box);
+  }
+  out.textContent = Array.from({length:n}, (_,i)=>i+1).join(' ');
+}
+
+const marks = [72,81,66,90,78];
+function resetArray() {
+  const visual = document.getElementById('arrayVisual');
+  visual.innerHTML = '<div><strong>marks[]:</strong></div><div class="array" id="markCells"></div>';
+  const wrap = document.getElementById('markCells');
+  marks.forEach((value,i) => {
+    const c = document.createElement('div'); c.className='cell'; c.innerHTML=`<small>[${i}]</small><br>${value}`; wrap.appendChild(c);
+  });
+  document.getElementById('arrayOutput').textContent='Press “Animate Traversal” to watch i move from 0 to 4.';
+}
+function runArray() {
+  resetArray();
+  const cells = [...document.querySelectorAll('#markCells .cell')];
+  const out = document.getElementById('arrayOutput');
+  let i=0; out.textContent='';
+  const timer=setInterval(()=>{
+    cells.forEach(c=>c.classList.remove('active'));
+    if(i<cells.length){
+      cells[i].classList.add('active');
+      out.textContent += `i = ${i}  -> marks[${i}] = ${marks[i]}\n`;
+      i++;
+    } else clearInterval(timer);
+  }, 500);
+}
+resetArray();
+
+function runTable() {
+  const n = safeInt('tableN', 7, 1, 20);
+  let s='';
+  for(let i=1;i<=10;i++) s += `${n} x ${i} = ${n*i}\n`;
+  document.getElementById('tableOutput').textContent=s;
+}
+
+function runAttendance() {
+  const n = safeInt('students', 8, 1, 25);
+  const visual = document.getElementById('attendanceVisual');
+  const out = document.getElementById('attendanceOutput');
+  visual.innerHTML='<div class="array" id="studentBoxes"></div>';
+  const wrap=document.getElementById('studentBoxes');
+  const cells=[];
+  for(let i=1;i<=n;i++){
+    const c=document.createElement('div'); c.className='cell'; c.textContent=`S${i}`; wrap.appendChild(c); cells.push(c);
+  }
+  out.textContent='Checking...';
+  let i=0;
+  const timer=setInterval(()=>{
+    cells.forEach(c=>c.classList.remove('active'));
+    if(i<n){ cells[i].classList.add('active'); out.textContent += `\nStudent ${i+1}: checked`; i++; }
+    else { clearInterval(timer); out.textContent += '\n\nLoop finished.'; }
+  }, 400);
+}
+
+function resetMatrix(){
+  const visual=document.getElementById('matrixVisual');
+  visual.innerHTML='<div class="matrix" style="grid-template-columns: repeat(4, 52px)" id="matrix"></div>';
+  const matrix=document.getElementById('matrix');
+  for(let r=0;r<3;r++) for(let c=0;c<4;c++){
+    const cell=document.createElement('div'); cell.className='matrix-cell'; cell.dataset.pos=`${r}-${c}`; cell.textContent=r*4+c+1; matrix.appendChild(cell);
+  }
+  document.getElementById('matrixOutput').textContent='Nested-loop order: row 0 across → row 1 across → row 2 across.';
+}
+function animateMatrix(){
+  resetMatrix(); const cells=[...document.querySelectorAll('#matrix .matrix-cell')]; const out=document.getElementById('matrixOutput');
+  out.textContent=''; let idx=0;
+  const timer=setInterval(()=>{
+    cells.forEach(c=>c.classList.remove('active'));
+    if(idx<cells.length){
+      const r=Math.floor(idx/4), c=idx%4;
+      cells[idx].classList.add('active'); out.textContent += `row=${r}, col=${c} -> value=${idx+1}\n`; idx++;
+    } else { clearInterval(timer); }
+  },350);
+}
+resetMatrix();
+
+function drawSeats(){
+  const rows=safeInt('seatRows',4,1,8), cols=safeInt('seatCols',5,1,10);
+  const visual=document.getElementById('seatVisual');
+  visual.innerHTML=`<div class="matrix" style="grid-template-columns: repeat(${cols}, 70px)" id="seatGrid"></div>`;
+  const grid=document.getElementById('seatGrid');
+  for(let r=1;r<=rows;r++) for(let c=1;c<=cols;c++){
+    const cell=document.createElement('div'); cell.className='matrix-cell'; cell.style.width='70px'; cell.textContent=`R${r}-S${c}`; grid.appendChild(cell);
+  }
+}
+drawSeats();
+
+function runPixelGrid(){
+  const w=safeInt('gridW',6,1,10), h=safeInt('gridH',4,1,8);
+  const visual=document.getElementById('pixelVisual');
+  visual.innerHTML=`<div class="matrix" style="grid-template-columns: repeat(${w}, 52px)" id="pixelGrid"></div>`;
+  const grid=document.getElementById('pixelGrid');
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+    const cell=document.createElement('div'); cell.className='matrix-cell'; cell.textContent=`${x},${y}`; grid.appendChild(cell);
+  }
+}
+runPixelGrid();
+
+function patternSquare(){
+  const n=safeInt('squareSize',5,1,12); let s='';
+  for(let row=1;row<=n;row++){ for(let col=1;col<=n;col++) s+='* '; s+='\n'; }
+  document.getElementById('squareOut').textContent=s;
+}
+function patternTriangle(){
+  const n=safeInt('triRows',5,1,15); let s='';
+  for(let row=1;row<=n;row++){ for(let col=1;col<=row;col++) s+='* '; s+='\n'; }
+  document.getElementById('triOut').textContent=s;
+}
+function patternNumbers(){
+  const n=safeInt('numRows',5,1,15); let s='';
+  for(let row=1;row<=n;row++){ for(let col=1;col<=row;col++) s+=col+' '; s+='\n'; }
+  document.getElementById('numOut').textContent=s;
+}
+function patternPyramid(){
+  const n=safeInt('pyrRows',5,1,12); let s='';
+  for(let row=1;row<=n;row++){
+    for(let space=1;space<=n-row;space++) s+='  ';
+    for(let star=1;star<=2*row-1;star++) s+='* ';
+    s+='\n';
+  }
+  document.getElementById('pyrOut').textContent=s;
+}
+patternSquare(); patternTriangle(); patternNumbers(); patternPyramid();
+
+function animateSteps(){
+  const start=safeInt('visualStart',1,-100,100), end=safeInt('visualEnd',8,-100,100), step=safeInt('visualStep',1,1,20);
+  const values=[]; if(start<=end){ for(let i=start;i<=end;i+=step) values.push(i); }
+  else { for(let i=start;i>=end;i-=step) values.push(i); }
+  const v=document.getElementById('stepVisual'); v.innerHTML='<div class="steps" id="allSteps"></div><div class="tiny" style="margin-top:12px" id="stepCaption"></div>';
+  const holder=document.getElementById('allSteps'); const caption=document.getElementById('stepCaption');
+  values.forEach(x=>{ const el=document.createElement('div'); el.className='step'; el.textContent=`i = ${x}`; holder.appendChild(el); });
+  const nodes=[...holder.children]; let idx=0;
+  const timer=setInterval(()=>{
+    nodes.forEach(n=>n.classList.remove('active'));
+    if(idx<nodes.length){ nodes[idx].classList.add('active'); caption.textContent=`Iteration ${idx+1} of ${nodes.length}`; idx++; }
+    else clearInterval(timer);
+  },450);
+}
+function showAllSteps(){
+  const start=safeInt('visualStart',1,-100,100), end=safeInt('visualEnd',8,-100,100), step=safeInt('visualStep',1,1,20);
+  const values=[]; if(start<=end){ for(let i=start;i<=end;i+=step) values.push(i); } else { for(let i=start;i>=end;i-=step) values.push(i); }
+  const v=document.getElementById('stepVisual'); v.innerHTML='<div class="steps"></div>';
+  const holder=v.firstElementChild; values.forEach(x=>{const el=document.createElement('div');el.className='step active';el.textContent=`i = ${x}`;holder.appendChild(el);});
+}
+showAllSteps();
+
+function runEven(){
+  const n=safeInt('evenLimit',20,2,100); let s='';
+  for(let i=2;i<=n;i+=2) s+=i+' ';
+  document.getElementById('evenOut').textContent=s;
+}
+function runSum(){
+  const n=safeInt('sumN',10,1,1000); let sum=0;
+  for(let i=1;i<=n;i++) sum+=i;
+  document.getElementById('sumOut').textContent=`Sum = ${sum}`;
+}
+function resetScratch(){
+  document.getElementById('scratch').value=`#include <stdio.h>\n\nint main() {\n    for (int i = 1; i <= 5; i++) {\n        printf("%d ", i);\n    }\n    return 0;\n}`;
+  document.getElementById('copyMsg').textContent='';
+}
+async function copyScratch(){
+  const text=document.getElementById('scratch').value;
+  try { await navigator.clipboard.writeText(text); document.getElementById('copyMsg').textContent='Copied!'; }
+  catch { document.getElementById('copyMsg').textContent='Copy blocked by browser permissions.'; }
+}
+
+// Give students a useful initial state.
+runCount(); runTable(); runEven(); runSum();
+</script>
+</body>
+</html>
